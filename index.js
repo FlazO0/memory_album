@@ -4,7 +4,9 @@ const mongoose = require("mongoose");
 const { parsePhoneNumberFromString } = require('libphonenumber-js');
 
 const NumberModel = require('./models/Number');
+const Redirect = require('./models/Redirect');
 const Visit = require('./models/Visit');
+
 
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -17,24 +19,6 @@ const PORT = 3000;
 
 app.set("view engine", "ejs");
 app.use(express.json({ limit: '2mb' }));
-app.use(async (req, res, next) => {
-  try {
-    let visit = await Visit.findOne();
-    if (!visit) {
-      visit = new Visit({ count: 1 });
-    } else {
-      visit.count += 1;
-    }
-    await visit.save();
-  } catch (err) {
-    console.error('Erro ao registrar visita:', err);
-  }
-  next();
-});
-
-app.get("/", (req, res) => {
-    res.render('index')
-});
 
 app.post('/save', async (req, res) => {
     const { number } = req.body;
@@ -58,18 +42,59 @@ app.post('/save', async (req, res) => {
 });
 
 app.get('/admin-stats', async (req, res) => {
-  try {
-    const numbersCount = await NumberModel.countDocuments();
-    const visitDoc = await Visit.findOne();
-    const visitsCount = visitDoc ? visitDoc.count : 0;
+    try {
+        const numbersCount = await NumberModel.countDocuments();
+        const visitDoc = await Visit.findOne();
+        const visitsCount = visitDoc ? visitDoc.count : 0;
+        const redirectDoc = await Redirect.findOne();
+        const redirectCount = redirectDoc ? redirectDoc.count : 0;
 
-    res.json({
-      total_numeros_salvos: numbersCount,
-      total_visitas: visitsCount
-    });
-  } catch (err) {
-    res.status(500).send('Erro ao buscar estatísticas.');
-  }
+        res.json({
+            total_numeros_salvos: numbersCount,
+            total_visitas: visitsCount,
+            total_redirecionamentos: redirectCount
+        });
+    } catch (err) {
+        res.status(500).send('Erro ao buscar estatísticas.');
+    }
+});
+
+app.get('/go', async (req, res) => {
+    try {
+        let redirect = await Redirect.findOne();
+        if (!redirect) {
+            redirect = new Redirect({ count: 1 });
+        } else {
+            redirect.count += 1;
+        }
+
+        await redirect.save();
+
+        // Redirecionar o usuário para sua playlist
+        res.redirect('https://open.spotify.com/playlist/SEU_PLAYLIST_AQUI');
+    } catch (err) {
+        console.error('Erro ao contar redirecionamento:', err);
+        res.status(500).send('Erro ao redirecionar.');
+    }
+});
+
+app.use(async (req, res, next) => {
+    try {
+        let visit = await Visit.findOne();
+        if (!visit) {
+            visit = new Visit({ count: 1 });
+        } else {
+            visit.count += 1;
+        }
+        await visit.save();
+    } catch (err) {
+        console.error('Erro ao registrar visita:', err);
+    }
+    next();
+});
+
+app.get("/", (req, res) => {
+    res.render('index')
 });
 
 app.listen(PORT, () => {
