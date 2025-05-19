@@ -71,7 +71,7 @@ app.get('/go', async (req, res) => {
         await redirect.save();
 
         // Redirecionar o usuário para sua playlist
-        res.redirect('https://open.spotify.com/playlist/SEU_PLAYLIST_AQUI');
+        res.redirect('https://open.spotify.com/playlist/1rZlsZ7Wq23NLh6MIBZJUg?si=c96e8c15e6e847b7');
     } catch (err) {
         console.error('Erro ao contar redirecionamento:', err);
         res.status(500).send('Erro ao redirecionar.');
