@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLZ_001 - CLASSIFIED</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    body {
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 800px;
+      padding: 20px;
+    }
+
+    .typewriter-text {
+      font-size: 1.5rem;
+      margin-bottom: 60px;
+      min-height: 60px;
+      animation: fadeIn 1s ease-in;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid white;
+      background-color: transparent;
+      color: white;
+      width: 260px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .mystery-button {
+      background-color: transparent;
+      color: white;
+      border: 2px solid white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      display: none;
+    }
+
+    .mystery-button:hover {
+      background-color: white;
+      color: black;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9rem;
+      opacity: 0.6;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="typewriter-text" id="typewriter">...</div>
+
+    <input type="text" id="whatsapp" placeholder="(00) 00000-0000" oninput="checkNumber()">
+
+    <button class="mystery-button" id="accessButton"
+      onclick="window.open('https://open.spotify.com/playlist/SEU_PLAYLIST_AQUI', '_blank')">
+      🔓 Acessar FLZ_001
+    </button>
+  </div>
+
+  <div class="footer">
+    fragmento perdido: <a href="https://instagram.com/flazo0" target="_blank"
+      style="color:#fff; text-decoration: underline;">G#%##RRRARHHH</a>
+  </div>
+
+  <script>
+    const phrases = [
+      "arquivo FLZ_001 foi descriptografado...",
+      "sinais sonoros detectados...",
+      "interceptando...",
+      "nível de acesso: público",
+      "decifre e siga",
+      "ele voltou."
+    ];
+
+    let i = 0;
+    const textElement = document.getElementById("typewriter");
+
+    function typeNextPhrase() {
+      textElement.textContent = "";
+      let j = 0;
+      const phrase = phrases[i];
+      const interval = setInterval(() => {
+        if (j < phrase.length) {
+          textElement.textContent += phrase[j];
+          j++;
+        } else {
+          clearInterval(interval);
+          setTimeout(() => {
+            i = (i + 1) % phrases.length;
+            typeNextPhrase();
+          }, 2000);
+        }
+      }, 70);
+    }
+
+    typeNextPhrase();
+
+    let debounceTimeout;
+
+    function checkNumber() {
+      clearTimeout(debounceTimeout);
+
+      debounceTimeout = setTimeout(() => {
+        const input = document.getElementById('whatsapp').value.trim();
+        const button = document.getElementById('accessButton');
+        const phoneRegex = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
+
+        if (phoneRegex.test(input)) {
+          // Envia para o servidor
+          fetch('/save', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ number: input })
+          })
+            .then(response => response.text())
+            .then(text => {
+              if (text === '1') {
+                button.style.display = 'inline-block'; // mostra o botão
+              } else {
+                button.style.display = 'none'; // esconde o botão
+              }
+            })
+            .catch(err => {
+              console.error('Erro na requisição:', err);
+              button.style.display = 'none'; // esconde o botão em caso de erro
+            });
+        } else {
+          button.style.display = 'none'; // esconde o botão se o regex falhar
+        }
+      }, 500); // espera 500ms após o último input para rodar
+    }
+  </script>
+
+</body>
+
+</html>
