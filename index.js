@@ -17,24 +17,6 @@ const PORT = 3000;
 
 app.set("view engine", "ejs");
 app.use(express.json({ limit: '2mb' }));
-app.use(async (req, res, next) => {
-  try {
-    let visit = await Visit.findOne();
-    if (!visit) {
-      visit = new Visit({ count: 1 });
-    } else {
-      visit.count += 1;
-    }
-    await visit.save();
-  } catch (err) {
-    console.error('Erro ao registrar visita:', err);
-  }
-  next();
-});
-
-app.get("/", (req, res) => {
-    res.render('index')
-});
 
 app.post('/save', async (req, res) => {
     const { number } = req.body;
@@ -70,6 +52,25 @@ app.get('/admin-stats', async (req, res) => {
   } catch (err) {
     res.status(500).send('Erro ao buscar estatísticas.');
   }
+});
+
+app.use(async (req, res, next) => {
+  try {
+    let visit = await Visit.findOne();
+    if (!visit) {
+      visit = new Visit({ count: 1 });
+    } else {
+      visit.count += 1;
+    }
+    await visit.save();
+  } catch (err) {
+    console.error('Erro ao registrar visita:', err);
+  }
+  next();
+});
+
+app.get("/", (req, res) => {
+    res.render('index')
 });
 
 app.listen(PORT, () => {
